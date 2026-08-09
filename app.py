@@ -177,9 +177,14 @@ hr {
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 
+def _center(svg: str, margin: str = "0.4rem 0") -> str:
+    """Wraps an inline SVG doodle in a centered div so it doesn't hug the left edge."""
+    return f'<div style="display:flex; justify-content:center; align-items:center; margin:{margin};">{svg}</div>'
+
+
 def skull_doodle_svg(width: int = 120) -> str:
     """A little hand-drawn-style skull, because Yorick insisted."""
-    return f"""
+    svg = f"""
     <svg width="{width}" height="{width}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="50" cy="42" rx="30" ry="28" fill="#e8dcc4" stroke="#241a0e" stroke-width="2.5"/>
         <path d="M22 50 Q20 70 30 78 L70 78 Q80 70 78 50" fill="#e8dcc4" stroke="#241a0e" stroke-width="2.5"/>
@@ -191,10 +196,11 @@ def skull_doodle_svg(width: int = 120) -> str:
         <path d="M28 78 Q50 84 72 78" fill="none" stroke="#241a0e" stroke-width="2"/>
     </svg>
     """
+    return _center(svg)
 
 
 def quill_doodle_svg(width: int = 110) -> str:
-    return f"""
+    svg = f"""
     <svg width="{width}" height="{width}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 85 Q40 60 75 15" stroke="#241a0e" stroke-width="2" fill="none"/>
         <path d="M75 15 C60 20 45 30 35 50 C50 45 65 35 75 15 Z" fill="#d8c48c" stroke="#241a0e" stroke-width="2"/>
@@ -202,10 +208,11 @@ def quill_doodle_svg(width: int = 110) -> str:
         <ellipse cx="18" cy="88" rx="7" ry="3" fill="#241a0e" opacity="0.5"/>
     </svg>
     """
+    return _center(svg)
 
 
 def crown_doodle_svg(width: int = 110) -> str:
-    return f"""
+    svg = f"""
     <svg width="{width}" height="{width}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <path d="M15 70 L20 35 L38 55 L50 25 L62 55 L80 35 L85 70 Z"
               fill="#d8c48c" stroke="#241a0e" stroke-width="2.5" stroke-linejoin="round"/>
@@ -215,11 +222,13 @@ def crown_doodle_svg(width: int = 110) -> str:
         <circle cx="80" cy="35" r="4" fill="#7a1f1f" stroke="#241a0e" stroke-width="1.5"/>
     </svg>
     """
+    return _center(svg)
 
 
 def castle_doodle_svg(width: int = 140) -> str:
-    return f"""
-    <svg width="{width}" height="{int(width*0.8)}" viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg">
+    height = round(width * (110 / 140))
+    svg = f"""
+    <svg width="{width}" height="{height}" viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg">
         <rect x="10" y="50" width="120" height="55" fill="#3a2b1a" stroke="#e8dcc4" stroke-width="1.5"/>
         <rect x="10" y="40" width="15" height="15" fill="#3a2b1a" stroke="#e8dcc4" stroke-width="1.5"/>
         <rect x="35" y="40" width="15" height="15" fill="#3a2b1a" stroke="#e8dcc4" stroke-width="1.5"/>
@@ -231,6 +240,7 @@ def castle_doodle_svg(width: int = 140) -> str:
         <circle cx="69" cy="8" r="3" fill="#e8c88c"/>
     </svg>
     """
+    return _center(svg)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -317,8 +327,13 @@ def prophesy(model, tokenizer, seed_text, n_words):
 # ══════════════════════════════════════════════════════════════════════════
 #  SESSION STATE
 # ══════════════════════════════════════════════════════════════════════════
-if "seed_text" not in st.session_state:
-    st.session_state.seed_text = "To be or not to be"
+# NOTE: this key must match the text_input's `key=` below exactly. Streamlit
+# ties a widget's displayed value to session_state[key] once that key exists,
+# so updating any *other* variable (e.g. a separate "seed_text") is silently
+# ignored on rerun. Writing directly to "seed_text_input" is what makes the
+# "Summon a line" button actually update the box.
+if "seed_text_input" not in st.session_state:
+    st.session_state.seed_text_input = "To be or not to be"
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -390,14 +405,13 @@ input_col, button_col = st.columns([4, 1])
 with input_col:
     seed_text = st.text_input(
         "Your unfinished line",
-        value=st.session_state.seed_text,
         key="seed_text_input",
         label_visibility="collapsed",
         placeholder="To be, or not to be...",
     )
 with button_col:
     if st.button("🎲 Summon a line", use_container_width=True):
-        st.session_state.seed_text = random_incomplete_line()
+        st.session_state.seed_text_input = random_incomplete_line()
         st.rerun()
 
 n_words = st.slider(
