@@ -401,6 +401,18 @@ except Exception as e:
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("### 🕯️ Speak your line into the darkness")
 
+def summon_random_line():
+    """Callback for the 'Summon a line' button.
+
+    Callbacks run *before* the script body (and its widgets) are re-executed,
+    so it's safe to write directly into a widget's session_state key here.
+    Doing this assignment inline in the script body instead (after the
+    text_input has already been instantiated) is what triggers Streamlit's
+    'cannot be modified after widget is instantiated' error.
+    """
+    st.session_state.seed_text_input = random_incomplete_line()
+
+
 input_col, button_col = st.columns([4, 1])
 with input_col:
     seed_text = st.text_input(
@@ -410,9 +422,11 @@ with input_col:
         placeholder="To be, or not to be...",
     )
 with button_col:
-    if st.button("🎲 Summon a line", use_container_width=True):
-        st.session_state.seed_text_input = random_incomplete_line()
-        st.rerun()
+    st.button(
+        "🎲 Summon a line",
+        use_container_width=True,
+        on_click=summon_random_line,
+    )
 
 n_words = st.slider(
     "How many words shall the Oracle prophesy?", min_value=1, max_value=10, value=1
