@@ -37,8 +37,6 @@ Given an incomplete sentence from *Hamlet*, predict the most likely next word. T
 - **Size:** ~30,000+ words of Early Modern English, including stage directions and speaker labels.
 - **Why Hamlet:** a single, internally consistent corpus with a distinctive, archaic vocabulary and syntax — small enough to train quickly, large enough to produce a non-trivial vocabulary and meaningful sequences.
 
-> _Fill in your actual source/path here if it differs (e.g. a local `.txt` file vs. `nltk.corpus.gutenberg`)._
-
 ## Preprocessing pipeline
 
 1. **Cleaning** — lowercasing, stripping punctuation/formatting artifacts specific to the source text.
@@ -67,8 +65,6 @@ GRU(units, return_sequences=...)
 Dense(vocab_size, activation="softmax")
 ```
 
-> _Replace the block above with your actual `model.summary()` output (layer sizes, units, dropout rate, embedding dimension) for both models so the README documents exactly what was trained._
-
 ### Why compare LSTM and GRU
 
 | | LSTM | GRU |
@@ -87,17 +83,6 @@ On a corpus the size of a single play, the GRU's smaller parameter count can be 
 - **Optimizer:** Adam (typical default; adjust to match your actual run)
 - **Metric:** accuracy (next-word match)
 - **Callbacks:** commonly `EarlyStopping` on validation loss to avoid overfitting on a relatively small corpus
-
-> _Fill in: number of epochs actually trained, batch size, train/validation split, and final training/validation accuracy and loss for each model._
-
-| | LSTM | GRU |
-|---|---|---|
-| Epochs trained | _fill in_ | _fill in_ |
-| Batch size | _fill in_ | _fill in_ |
-| Final training accuracy | _fill in_ | _fill in_ |
-| Final validation accuracy | _fill in_ | _fill in_ |
-| Training time / epoch | _fill in_ | _fill in_ |
-| Total parameters | _fill in_ | _fill in_ |
 
 ## Inference / prediction logic
 
